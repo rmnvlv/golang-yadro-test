@@ -71,7 +71,7 @@ func FormatData(data []string) (DataIn, error) {
 		subject.timeOfSubj, err = time.Parse("15:04", subjectString[0])
 		if err != nil || subject.timeOfSubj.After(timeEnd) {
 			return DataIn{}, fmt.Errorf(fmt.Sprintf("Error in subject with time in line '%s': %s", data[i], err))
-		} else if i != 3 && formattingData.subjects[i-1].timeOfSubj.After(subject.timeOfSubj) {
+		} else if i != 3 && formattingData.subjects[i-4].timeOfSubj.After(subject.timeOfSubj) {
 			return DataIn{}, fmt.Errorf(fmt.Sprintf("Bad time in lines: '%s' after '%s'", data[i-1], data[i]))
 		}
 
@@ -104,13 +104,5 @@ func FormatData(data []string) (DataIn, error) {
 		//Add subject to array
 		formattingData.subjects = append(formattingData.subjects, subject)
 	}
-
-	//Chek for
-	// for i := 1; i < len(formattingData.subjects); i++ {
-	// 	if formattingData.subjects[i-1].timeOfSubj.After(formattingData.subjects[i].timeOfSubj) {
-	// 		return DataIn{}, fmt.Errorf(fmt.Sprintf("Bad time in lines: '%s' after '%s'", data[i+2], data[i+3]))
-	// 	}
-	// }
-
 	return formattingData, err
 }
