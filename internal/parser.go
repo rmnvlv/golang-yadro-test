@@ -1,1 +1,3 @@
 package internal
+
+func ParseData() {}

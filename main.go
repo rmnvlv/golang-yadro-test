@@ -18,16 +18,16 @@ func main() {
 	}
 
 	fmt.Println("Processing(+): Chek data for errors and fill in normal format ")
-	dataIn, err := FormatDataIn(data)
+	formattedData, err := internal.FormatData(data)
 	if err != nil {
 		log.Fatalf("Error with formatting data input: %s", err)
 	}
 
 	fmt.Println("Processing(+): Formatting data")
-	dataOut, err := FormatDataOut(dataIn)
+	parsedData, err := internal.ParseData(formattedData)
 	if err != nil {
 		log.Fatalf("Error with formatting data out: %s", err)
 	}
 
-	OutputData(dataOut)
+	internal.WriteData(parsedData)
 }
