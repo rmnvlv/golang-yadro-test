@@ -39,6 +39,12 @@ func (s *StackSubj[T]) IsEmpty() bool {
 	return len(s.data) == 0
 }
 
+type ByName []Subject
+
+func (a ByName) Len() int           { return len(a) }
+func (a ByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByName) Less(i, j int) bool { return a[i].name < a[j].name }
+
 func ParseData(data DataIn) (DataOut, error) {
 	dataOut := DataOut{}
 	var err error
@@ -111,7 +117,7 @@ func ParseData(data DataIn) (DataOut, error) {
 		switch subjectIn.id {
 		//ID1: Клиент пришел
 		case 1:
-			if clientsInClub[subjectIn.name] != nil {
+			if clientsInClub[subjectIn.name] == true {
 				subjectOut.timeOfSubj = subjectIn.timeOfSubj
 				subjectOut.id = 13
 				subjectOut.name = errosOfClients[1]
@@ -124,7 +130,7 @@ func ParseData(data DataIn) (DataOut, error) {
 		//ID2: Клиент сел за стол
 		case 2:
 			//Неизвестный клиент
-			if clientsInClub[subjectIn.name] == nil {
+			if clientsInClub[subjectIn.name] != true {
 				subjectOut.timeOfSubj = subjectIn.timeOfSubj
 				subjectOut.id = 13
 				subjectOut.name = errosOfClients[2]
@@ -164,6 +170,13 @@ func ParseData(data DataIn) (DataOut, error) {
 			}
 		//ID3: Клиент ожидает
 		case 3:
+			if clientsInClub[subjectIn.name] == nil {
+				subjectOut.timeOfSubj = subjectIn.timeOfSubj
+				subjectOut.id = 13
+				subjectOut.name = errosOfClients[2]
+				dataOut.subjectsOut = append(dataOut.subjectsOut, subjectOut)
+				continue
+			}
 			//Есть свободные столы а клиент ждет
 			if tableClear {
 				subjectOut.timeOfSubj = subjectIn.timeOfSubj
@@ -257,10 +270,12 @@ func ParseData(data DataIn) (DataOut, error) {
 		}
 		re := regexp.MustCompile("[0-9]+")
 		mainTime := re.FindAllString(tables[i].timeInUsed.String(), -1)
-		// fmt.Println(mainTime)
 		if len(mainTime) > 1 {
 			if len(mainTime[1]) < 2 {
 				mainTime[1] = "0" + mainTime[1]
+			}
+			if len(mainTime[0]) < 2 {
+				mainTime[0] = "0" + mainTime[0]
 			}
 		}
 
@@ -280,15 +295,22 @@ func ParseData(data DataIn) (DataOut, error) {
 		return tables[i].owner < tables[j].owner
 	})
 
-	for _, v := range tables {
-		if v.owner != "none" {
-			dataOut.subjectsOut = append(dataOut.subjectsOut, Subject{
+	endSubj := []Subject{}
+	//End of the work day
+	for name, v := range clientsInClub {
+		if v == true {
+			endSubj = append(endSubj, Subject{
 				timeOfSubj: data.timeEnd,
 				id:         11,
-				name:       v.owner,
+				name:       name,
 			})
 		}
 	}
+
+	//Alphabet sort
+	sort.Sort(ByName(endSubj))
+
+	dataOut.subjectsOut = append(dataOut.subjectsOut, endSubj...)
 
 	return dataOut, err
 }

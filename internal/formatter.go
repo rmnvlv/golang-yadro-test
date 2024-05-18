@@ -69,10 +69,12 @@ func FormatData(data []string) (DataIn, error) {
 
 		//Check and Write time of subj
 		subject.timeOfSubj, err = time.Parse("15:04", subjectString[0])
-		if err != nil || subject.timeOfSubj.After(timeEnd) {
-			return DataIn{}, fmt.Errorf(fmt.Sprintf("Error in subject with time in line '%s': %s", data[i], err))
+		if subject.timeOfSubj.After(timeEnd) {
+			return DataIn{}, fmt.Errorf(fmt.Sprintf("Error in subject with time in line '%s': %s", data[i], "Subject time after end of working time"))
 		} else if i != 3 && formattingData.subjects[i-4].timeOfSubj.After(subject.timeOfSubj) {
 			return DataIn{}, fmt.Errorf(fmt.Sprintf("Bad time in lines: '%s' after '%s'", data[i-1], data[i]))
+		} else if err != nil {
+			return DataIn{}, fmt.Errorf(fmt.Sprintf("Error in subject with time-forme'%s': %s", data[i], err))
 		}
 
 		//Check and Write subj id
@@ -95,6 +97,10 @@ func FormatData(data []string) (DataIn, error) {
 
 		//Check table number
 		if subject.id == 2 {
+			// fmt.Println(len(subjectString))
+			if len(subjectString) < 4 {
+				return DataIn{}, fmt.Errorf(fmt.Sprintf("Not enought arguments with id 2 '%s'", data[i]))
+			}
 			subject.tableNumb, err = strconv.Atoi(subjectString[3])
 			if err != nil || subject.tableNumb > formattingData.tables {
 				return DataIn{}, fmt.Errorf(fmt.Sprintf("Bad table number in line '%s': %s", data[i], err))
