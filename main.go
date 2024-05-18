@@ -1,18 +1,19 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"golang-yadro-test/internal"
 	"log"
 )
 
 func main() {
-	fmt.Println("Processing(+): Read data")
-	// if len(os.Args) < 2 {
-	// 	log.Fatalf("Missing parameter, provide file name!")
-	// }
+	var path string
+	flag.StringVar(&path, "path", "./test_file.txt", "Provide the file path")
+	flag.Parse()
 
-	data, err := internal.ReadData("./file.txt")
+	fmt.Println("Processing(+): Read data")
+	data, err := internal.ReadData(path)
 	if err != nil {
 		log.Fatalf("Error with read data: %s", err)
 	}
