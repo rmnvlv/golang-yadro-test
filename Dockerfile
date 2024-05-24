@@ -1,6 +1,6 @@
-FROM golang:latest 
+FROM golang:latest
 RUN mkdir /app 
 ADD . /app/ 
 WORKDIR /app 
-RUN go build main.go
-CMD ["/app/main"]
+RUN go build -o ./app .
+CMD ["./app" "--path=/test_file.txt"]
